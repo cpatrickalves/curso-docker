@@ -1,2 +1,3 @@
 # curso-docker
-Curso de Docker e intodrução ao Docker Swarm
+
+Curso de Docker e introdução ao Docker Swarm.
