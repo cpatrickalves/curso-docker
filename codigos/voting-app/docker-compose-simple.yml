@@ -1,0 +1,45 @@
+version: "3"
+services:
+  vote:
+    build:
+      context: ./vote
+      target: dev
+    depends_on:
+      - redis
+    volumes:
+      - ./vote:/usr/local/app
+    ports:
+      - "8080:80"
+
+  result:
+    build: ./result
+    # use nodemon rather than node for local dev
+    entrypoint: nodemon --inspect=0.0.0.0 server.js
+    depends_on:
+      - db
+    volumes:
+      - ./result:/usr/local/app
+    ports:
+      - "8081:80"
+      - "127.0.0.1:9229:9229"
+
+  worker:
+    build:
+      context: ./worker
+    depends_on:
+      - redis
+      - db
+
+  redis:
+    image: redis:alpine
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+
+volumes:
+  db-data:
