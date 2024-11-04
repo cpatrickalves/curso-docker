@@ -53,6 +53,20 @@ poetry run uvicorn main:app --host 0.0.0.0 --port 8000
 
 ### Usando Docker
 
+1. Construa a imagem Docker:
+
+```bash
+docker build -t api-cpu:latest .
+```
+
+2. Execute o container:
+
+```bash
+docker run -p 8000:8000 api-cpu:latest
+```
+
+### Usando Docker Compose
+
 1. Construa e execute o container usando Docker Compose:
 
 ```bash
