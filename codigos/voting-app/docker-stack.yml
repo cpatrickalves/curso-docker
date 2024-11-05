@@ -39,6 +39,14 @@ services:
       - frontend
     deploy:
       replicas: 2
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=network_public"
+        - "traefik.http.routers.vote.rule=Host(`votacao.cognicode.tech`)"
+        - "traefik.http.routers.vote.entrypoints=websecure"
+        - "traefik.http.routers.vote.priority=1"
+        - "traefik.http.routers.vote.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.vote.service=vote"
 
   result:
     image: dockersamples/examplevotingapp_result
@@ -48,6 +56,14 @@ services:
       - backend
     deploy:
       replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=network_public"
+        - "traefik.http.routers.result.rule=Host(`resultado.cognicode.tech`)"
+        - "traefik.http.routers.result.entrypoints=websecure"
+        - "traefik.http.routers.result.priority=1"
+        - "traefik.http.routers.result.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.result.service=result"
 
   worker:
     image: dockersamples/examplevotingapp_worker
