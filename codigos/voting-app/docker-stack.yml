@@ -5,11 +5,16 @@
 version: "3.9"
 
 services:
-
   redis:
     image: redis:alpine
     networks:
       - frontend
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
 
   db:
     image: postgres:15-alpine
@@ -20,6 +25,11 @@ services:
       - db-data:/var/lib/postgresql/data
     networks:
       - backend
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == manager
 
   vote:
     image: dockersamples/examplevotingapp_vote
@@ -36,6 +46,8 @@ services:
       - 8081:80
     networks:
       - backend
+    deploy:
+      replicas: 1
 
   worker:
     image: dockersamples/examplevotingapp_worker
