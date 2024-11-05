@@ -1,0 +1,73 @@
+version: "3.7"
+
+# configura os Serviços do Stack
+services:
+  # define o serviço
+  whoami:
+    # define a imagem
+    image: traefik/whoami
+    # define o Entrypoint
+    entrypoint: /whoami
+    # define o Command
+    command: --verbose
+    # define o volume que armazena os arquivos
+    volumes:
+      - container_data:/var/www/html
+    # define as variáveis de ambiente
+    environment:
+      - WHOAMI_PORT_NUMBER=9090
+    # define a rede que o container vai utilizar
+    networks:
+      - network_public
+    # configura as portas expostas
+    #ports:
+    #  - 8080:8080
+    # configurações de Deploy do Serviço
+    deploy:
+      # define o modo de deploy
+      mode: replicated
+      # define o número de réplicas
+      replicas: 1
+      # define a estratégia de deploy
+      placement:
+        constraints:
+          - node.role == manager
+          # - node.labels.gpu == true
+          # - node.hostname == worker1
+      resources:
+        limits:
+          # define a quantidade de CPU
+          cpus: "1"
+          # define a quantidade de RAM
+          memory: 2048M
+      labels:
+        # habilita o Traefik
+        - traefik.enable=true
+        # configura o endereço do serviço
+        - traefik.http.routers.whoami.rule=Host(`whoami.luizeof.dev`)
+        # configura o SSL do Serviço
+        - traefik.http.routers.whoami.entrypoints=websecure
+        # configura o Gerador do Certificado SSL
+        - traefik.http.routers.whoami.tls.certresolver=letsencryptresolver
+        # configura o nome do serviço junto ao nome da rota
+        - traefik.http.routers.whoami.service=whoami
+        # configura a porta do serviço
+        - traefik.http.services.whoami.loadbalancer.server.port=9090
+        # habilita o passHostHeader para o serviço
+        - traefik.http.services.whoami.loadbalancer.passHostHeader=true
+# configura os Volumes do Stack
+volumes:
+  # nome virtual do volume dentro do stack
+  container_data:
+    # informa o nome real do volume no docker
+    name: container_data
+    # informa que o volume será externo ao stack
+    external: true
+# configura as Redes do Stack
+networks:
+  # nome virtual da rede dentro do stack
+  network_public:
+    # informa o nome real do volume no servidor
+    name: network_public
+    # informa que a rede será externa ao stack
+    external: true
